@@ -1,6 +1,6 @@
 /*jshint validthis:true */
 
-import ReusableListItemView from 'list-view/reusable_list_item_view';
+import ReusableListItemView from './reusable-list-item-view';
 
 var get     = Ember.get;
 var set     = Ember.set;
@@ -91,7 +91,13 @@ export default Ember.Mixin.create({
   emptyViewClass: Ember.View,
   classNames: ['ember-list-view'],
   attributeBindings: ['style'],
-  classNameBindings: ['_isGrid:ember-list-view-grid:ember-list-view-list'],
+  classNameBindings: [
+    '_isGrid:ember-list-view-grid:ember-list-view-list',
+    'isScrolling:ember-list-view-scrolling'
+  ],
+  isScrolling: false,
+  _timer: null,
+  scrollLatency: 250, // 250 is the default animationDuration for zynga/scroller
   scrollTop: 0,
   bottomPadding: 0, // TODO: maybe this can go away
   _lastEndingIndex: 0,
@@ -99,8 +105,14 @@ export default Ember.Mixin.create({
   _cachedPos: 0,
 
   _isGrid: Ember.computed('columnCount', function() {
-    return this.get('columnCount') > 1;
+    return get(this, 'columnCount') > 1;
   }).readOnly(),
+
+  clearTimer: Ember.on('willDestroyElement', function () {
+    if (this._timer) {
+      clearTimeout(this._timer);
+    }
+  }),
 
   /**
     @private
@@ -152,7 +164,7 @@ export default Ember.Mixin.create({
   },
 
   willInsertElement: function() {
-    if (!this.get('height') || !this.get('rowHeight')) {
+    if (!get(this, 'height') || !get(this, 'rowHeight')) {
       throw new Error('A ListView must be created with a height and a rowHeight.');
     }
     this._super();
@@ -224,6 +236,8 @@ export default Ember.Mixin.create({
     @method _scrollContentTo
   */
   _scrollContentTo: function(y) {
+    var that = this;
+
     var startingIndex, endingIndex,
         contentIndex, visibleEndingIndex, maxContentIndex,
         contentIndexEnd, contentLength, scrollTop, content;
@@ -233,6 +247,14 @@ export default Ember.Mixin.create({
     if (this.scrollTop === scrollTop) {
       return;
     }
+
+    this.clearTimer();
+
+    set(this, 'isScrolling', true);
+
+    this._timer = setTimeout(function () {
+      set(that, 'isScrolling', false);
+    }, this.scrollLatency);
 
     // allow a visual overscroll, but don't scroll the content. As we are doing needless
     // recycyling, and adding unexpected nodes to the DOM.
@@ -307,7 +329,7 @@ export default Ember.Mixin.create({
   }),
 
   _totalHeightWithHeightForIndex: function() {
-    var length = this.get('content.length');
+    var length = get(this, 'content.length');
     return this._cachedHeightLookup(length);
   },
 
@@ -540,7 +562,6 @@ export default Ember.Mixin.create({
     @method _numChildViewsForViewport
   */
   _numChildViewsForViewport: function() {
-
     if (this.heightForIndex) {
       return this._numChildViewsForViewportWithMultiHeight();
     } else {
@@ -551,10 +572,10 @@ export default Ember.Mixin.create({
   _numChildViewsForViewportWithoutMultiHeight:  function() {
     var height, rowHeight, paddingCount, columnCount;
 
-    height = get(this, 'height');
-    rowHeight = get(this, 'rowHeight');
+    height       = get(this, 'height');
+    rowHeight    = get(this, 'rowHeight');
     paddingCount = get(this, 'paddingCount');
-    columnCount = get(this, 'columnCount');
+    columnCount  = get(this, 'columnCount');
 
     return (ceil(height / rowHeight) * columnCount) + (paddingCount * columnCount);
   },
@@ -562,8 +583,8 @@ export default Ember.Mixin.create({
   _numChildViewsForViewportWithMultiHeight:  function() {
     var rowHeight, paddingCount, columnCount;
     var scrollTop = this.scrollTop;
-    var viewportHeight = this.get('height');
-    var length = this.get('content.length');
+    var viewportHeight = get(this, 'height');
+    var length = get(this, 'content.length');
     var heightfromTop = 0;
     var padding = get(this, 'paddingCount');
 
@@ -621,8 +642,8 @@ export default Ember.Mixin.create({
   _calculatedStartingIndex: function() {
     var rowHeight, paddingCount, columnCount;
     var scrollTop = this.scrollTop;
-    var viewportHeight = this.get('height');
-    var length = this.get('content.length');
+    var viewportHeight = get(this, 'height');
+    var length = get(this, 'content.length');
     var heightfromTop = 0;
     var padding = get(this, 'paddingCount');
 
@@ -690,7 +711,7 @@ export default Ember.Mixin.create({
     @method _addItemView
     @returns {Ember.View} ember view class for this index
   */
-  itemViewForIndex: function(contentIndex) {
+  itemViewForIndex: function(/*contentIndex*/) {
     return get(this, 'itemViewClass');
   },
 
@@ -780,10 +801,10 @@ export default Ember.Mixin.create({
   _syncListContainerWidth: function() {
     var elementWidth, columnCount, containerWidth, element;
 
-    elementWidth = get(this, 'elementWidth');
-    columnCount = get(this, 'columnCount');
+    elementWidth   = get(this, 'elementWidth');
+    columnCount    = get(this, 'columnCount');
     containerWidth = elementWidth * columnCount;
-    element = this.$('.ember-list-container');
+    element        = this.$('.ember-list-container');
 
     if (containerWidth && element) {
       element.css('width', containerWidth);

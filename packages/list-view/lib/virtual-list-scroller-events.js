@@ -1,9 +1,10 @@
 /*jshint validthis:true */
 
-var fieldRegex = /input|textarea|select/i,
-  hasTouch = ('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch,
-  handleStart, handleMove, handleEnd, handleCancel,
-  startEvent, moveEvent, endEvent, cancelEvent;
+var get = Ember.get;
+var fieldRegex = /input|textarea|select/i;
+var hasTouch = ('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch;
+var handleStart, handleMove, handleEnd, handleCancel, startEvent, moveEvent, endEvent, cancelEvent;
+
 if (hasTouch) {
   startEvent = 'touchstart';
   handleStart = function (e) {
@@ -102,24 +103,30 @@ export default Ember.Mixin.create({
   init: function() {
     this.on('didInsertElement', this, 'bindScrollerEvents');
     this.on('willDestroyElement', this, 'unbindScrollerEvents');
+
     this.scrollerEventHandlers = {
-      start: bind(this, handleStart),
-      move: bind(this, handleMove),
-      end: bind(this, handleEnd),
+      start:  bind(this, handleStart),
+      move:   bind(this, handleMove),
+      end:    bind(this, handleEnd),
       cancel: bind(this, handleCancel),
-      wheel: bind(this, handleWheel)
+      wheel:  bind(this, handleWheel)
     };
+
     return this._super();
   },
   scrollElement: Ember.computed.oneWay('element').readOnly(),
+
   bindScrollerEvents: function() {
-    var el = this.get('scrollElement'),
-      handlers = this.scrollerEventHandlers;
+    var el = get(this, 'scrollElement');
+    var handlers = this.scrollerEventHandlers;
+
     bindElement(el, handlers);
   },
+
   unbindScrollerEvents: function() {
-    var el = this.get('scrollElement'),
-      handlers = this.scrollerEventHandlers;
+    var el = get(this, 'scrollElement');
+    var handlers = this.scrollerEventHandlers;
+
     unbindElement(el, handlers);
     unbindWindow(handlers);
   }

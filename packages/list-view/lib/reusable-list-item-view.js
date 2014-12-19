@@ -1,4 +1,4 @@
-import ListItemViewMixin from 'list-view/list_item_view_mixin';
+import ListItemViewMixin from './list-item-view-mixin';
 
 var get = Ember.get, set = Ember.set;
 
@@ -12,9 +12,7 @@ export default Ember.View.extend(ListItemViewMixin, {
     this._proxyContext = context;
   },
 
-  isVisible: Ember.computed('context.content', function () {
-    return !!this.get('context.content');
-  }),
+  isVisible: Ember.computed.notEmpty('context.content'),
 
   updateContext: function (newContext) {
     var context = get(this._proxyContext, 'content');

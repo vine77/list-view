@@ -1,5 +1,5 @@
-import EmberListView from './list_view';
-import EmberVirtualListView from './virtual_list_view';
+import EmberListView from './list-view';
+import EmberVirtualListView from './virtual-list-view';
 
 function createHelper (view, options) {
   var hash = options.hash;

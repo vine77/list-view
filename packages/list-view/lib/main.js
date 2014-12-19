@@ -1,9 +1,9 @@
-import ReusableListItemView from 'list-view/reusable_list_item_view';
-import VirtualListView from 'list-view/virtual_list_view';
-import ListItemView from 'list-view/list_item_view';
-import { EmberList, EmberVirtualList } from 'list-view/helper';
-import ListView from 'list-view/list_view';
-import ListViewHelper from 'list-view/list_view_helper';
+import ReusableListItemView from './reusable-list-item-view';
+import VirtualListView from './virtual-list-view';
+import ListItemView from './list-item-view';
+import { EmberList, EmberVirtualList } from './helper';
+import ListView from './list-view';
+import ListViewHelper from './list-view-helper';
 
 Ember.ReusableListItemView = ReusableListItemView;
 Ember.VirtualListView      = VirtualListView;

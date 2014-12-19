@@ -2,11 +2,12 @@
   global Scroller
 */
 
-import ListViewMixin from 'list-view/list_view_mixin';
-import ListViewHelper from 'list-view/list_view_helper';
-import VirtualListScrollerEvents from 'list-view/virtual_list_scroller_events';
+import ListViewMixin from './list-view-mixin';
+import ListViewHelper from './list-view-helper';
+import VirtualListScrollerEvents from './virtual-list-scroller-events';
 
 var get = Ember.get;
+var set = Ember.set;
 
 function updateScrollerDimensions(target) {
   var width, height, totalHeight;
@@ -30,6 +31,9 @@ function updateScrollerDimensions(target) {
 export default Ember.ContainerView.extend(ListViewMixin, VirtualListScrollerEvents, {
   _isScrolling: false,
   _mouseWheel: null,
+  _scrollerTop: 0,
+  applyTransform: ListViewHelper.apply3DTransform,
+
   css: {
     position: 'relative',
     overflow: 'hidden'
@@ -40,8 +44,6 @@ export default Ember.ContainerView.extend(ListViewMixin, VirtualListScrollerEven
     this.setupScroller();
     this.setupPullToRefresh();
   },
-  _scrollerTop: 0,
-  applyTransform: ListViewHelper.apply3DTransform,
 
   setupScroller: function(){
     var view = this;
@@ -60,6 +62,7 @@ export default Ember.ContainerView.extend(ListViewMixin, VirtualListScrollerEven
         view.applyTransform(view.listContainerElement, 0, -top);
       }
     }, {
+      animationDuration: this.scrollLatency,
       scrollingX: false,
       scrollingComplete: function(){
         view.trigger('scrollingDidComplete');
@@ -157,7 +160,7 @@ export default Ember.ContainerView.extend(ListViewMixin, VirtualListScrollerEven
       endingScrollTop = this._scrollerTop;
 
       if (startingScrollTop !== endingScrollTop) {
-        event = Ember.$.Event("scrollerstart");
+        event = Ember.$.Event('scrollerstart');
         Ember.$(touches[0].target).trigger(event);
 
         this._isScrolling = true;

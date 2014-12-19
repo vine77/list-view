@@ -8,7 +8,7 @@ var wrap = require('broccoli-wrap');
 var uglify = require('broccoli-uglify-js');
 var es3SafeRecast = require('broccoli-es3-safe-recast');
 var pickFiles = require('broccoli-static-compiler');
-var version = require('./lib/calculate_version');
+var version = require('./lib/calculate-version');
 var replace = require('broccoli-string-replace');
 
 function testTree(libTree, packageName){

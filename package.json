@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ember server",
     "postinstall": "bower install",
-    "demo": "ember build && node lib/demo_server.js",
+    "demo": "ember build && node lib/demo-server.js",
     "docs": "./bin/generate_docs.js",
     "test": "ember test",
     "build-all": "ember build --environment production"
